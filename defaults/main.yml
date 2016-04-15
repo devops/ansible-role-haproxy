@@ -1,0 +1,63 @@
+---
+# defaults file for haproxy
+
+haproxy_manage_config: true
+haproxy_etc_prefix: /etc
+
+haproxy_global:
+  log:
+    - address: /dev/log
+      facility: local0
+    - address: /dev/log
+      facility: local1
+      level: notice
+  chroot: /var/lib/haproxy
+  user: haproxy
+  group: haproxy
+  daemon: true
+
+haproxy_defaults:
+  mode: http
+  log:
+    - address: /dev/log
+      facility: local1
+      level: notice
+  timeout:
+      - param: 'connect'
+        value: '5000ms'
+      - param: 'client'
+        value: '50000ms'
+      - param: 'server'
+        value: '50000ms'
+  options:
+    - httpclose
+    - forwardfor except 127.0.0.0/8
+    - redispatch
+    - abortonclose
+    - httplog
+    - dontlognull
+  errorfile:
+      - code: 400
+        file: /etc/haproxy/errors/400.http
+      - code: 403
+        file: /etc/haproxy/errors/403.http
+      - code: 408
+        file: /etc/haproxy/errors/408.http
+      - code: 500
+        file: /etc/haproxy/errors/500.http
+      - code: 502
+        file: /etc/haproxy/errors/502.http
+      - code: 504
+        file: /etc/haproxy/errors/504.http
+
+haproxy_stats:
+  name: 'global_monitor'
+  ip: "{{ ansible_default_ipv4.address }}"
+  port: '8888'
+  stats:
+    enabled: True
+    hide_version: true
+    uri: /stats_url
+    realm: Welcome\ to\ haproxy\ monitor
+    auth: admin:admin
+    refresh: 2s

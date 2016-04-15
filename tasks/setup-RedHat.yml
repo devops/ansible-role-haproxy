@@ -1,0 +1,16 @@
+---
+# tasks file for RedHat
+
+- name: Installs haproxy as well as socat for socket api.
+  yum: name={{ item }} state=installed
+  with_items:
+    - haproxy
+    - socat
+  ignore_errors: true
+
+- name: Ensure HAProxy is started and enabled on boot.
+  service: name=haproxy enabled=yes
+
+- name: Ensure chroot directory exists.
+  file: name={{ haproxy_global.chroot }} state=directory
+  when: haproxy_global.chroot is defined and haproxy_global.chroot

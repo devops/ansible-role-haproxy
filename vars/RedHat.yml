@@ -1,0 +1,4 @@
+---
+# vars file for RedHat
+
+haproxy_config: "/etc/haproxy/haproxy.cfg"

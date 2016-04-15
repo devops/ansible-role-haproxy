@@ -1,0 +1,92 @@
+---
+# tasks file configure.yml
+
+## ASSEMBLE CONFIG - FRONTEND
+- name: 'Create directory for the frontend'
+  file: path=/etc/haproxy/frontends.d state=directory
+
+- name: 'Empty the folder if not already empty'
+  command: find {{ haproxy_etc_prefix }}/haproxy/frontends.d -name *.cfg -exec rm -f {} \;
+
+- name: 'Build up the frontends'
+  template: src=frontend.cfg dest={{ haproxy_etc_prefix }}/haproxy/frontends.d/{{ item.name }}.cfg
+  with_items: haproxy_frontends
+  when: haproxy_frontends is defined
+
+## ASSEMBLE CONFIG - BACKEND
+
+- name: 'Create directory for the backends'
+  file: path={{ haproxy_etc_prefix }}/haproxy/backends.d state=directory
+
+- name: 'Empty the folder if not already empty'
+  command: find {{ haproxy_etc_prefix }}/haproxy/backends.d -name *.cfg -exec rm -f {} \;
+
+- name: 'Build up the backends'
+  template: src=backend.cfg dest={{ haproxy_etc_prefix }}/haproxy/backends.d/{{ item.name }}.cfg
+  with_items: haproxy_backends
+  when: haproxy_backends is defined
+
+## ASSEMBLE CONFIG - LISTEN
+
+- name: 'Create directory for the listen sections'
+  file: path={{ haproxy_etc_prefix }}/haproxy/listen.d state=directory
+
+- name: 'Empty the folder if not already empty'
+  command: find {{ haproxy_etc_prefix }}/haproxy/listen.d -name *.cfg -exec rm -f {} \;
+
+- name: 'Build up the listen sections'
+  template: src=listen.cfg dest={{ haproxy_etc_prefix }}/haproxy/listen.d/{{ item.name }}.cfg
+  with_items: haproxy_listen
+  when: haproxy_listen is defined
+
+## ASSEMBLE CONFIG - USERLIST
+
+- name: 'Create directory for the userlists'
+  file: path={{ haproxy_etc_prefix }}/haproxy/userlists.d state=directory
+
+- name: 'Empty the folder if not already empty'
+  command: find {{ haproxy_etc_prefix }}/haproxy/userlists.d -name *.cfg -exec rm -f {} \;
+
+- name: 'Build up the userlist sections'
+  template: src=userlist.cfg dest={{ haproxy_etc_prefix }}/haproxy/userlists.d/{{ item.name }}.cfg
+  with_items: haproxy_userlists
+  when: haproxy_userlists is defined
+
+## ASSEMBLE CONFIG - GLOBAL & DEFAULT & STATS
+
+- name: 'Create  the compiled folder'
+  file: path={{ haproxy_etc_prefix }}/haproxy/compiled state=directory
+
+- name: 'Empty the folder if not already empty'
+  command: find {{ haproxy_etc_prefix }}/haproxy/compiled -name *.cfg -exec rm -f {} \;
+
+- name: 'Build up the global config'
+  template: src=global.cfg dest={{ haproxy_etc_prefix }}/haproxy/compiled/01-global.cfg
+  when: haproxy_global is defined
+  tags: 'test'
+
+- name: 'Build up the default config'
+  template: src=defaults.cfg dest={{ haproxy_etc_prefix }}/haproxy/compiled/02-defaults.cfg
+  when: haproxy_defaults is defined
+
+- name: 'Build up the stats config'
+  template: src=stats.cfg dest={{ haproxy_etc_prefix }}/haproxy/compiled/03-stats.cfg
+  when: haproxy_stats is defined
+
+## ASSEMBLE FINAL CONFIG
+
+- name: 'Assemble the frontends configuration file'
+  assemble: src={{ haproxy_etc_prefix }}/haproxy/frontends.d dest={{ haproxy_etc_prefix }}/haproxy/compiled/04-frontends.cfg
+
+- name: 'Assemble the backends configuration file'
+  assemble: src={{ haproxy_etc_prefix }}/haproxy/backends.d dest={{ haproxy_etc_prefix }}/haproxy/compiled/05-backends.cfg
+
+- name: 'Assemble the listen sections configuration file'
+  assemble: src={{ haproxy_etc_prefix }}/haproxy/listen.d dest={{ haproxy_etc_prefix }}/haproxy/compiled/06-listen.cfg
+
+- name: 'Assemble the userlists sections configuration file'
+  assemble: src={{ haproxy_etc_prefix }}/haproxy/userlists.d dest={{ haproxy_etc_prefix }}/haproxy/compiled/07-userlists.cfg
+
+- name: 'Assemble the final configuration file'
+  assemble: src={{ haproxy_etc_prefix }}/haproxy/compiled dest={{ haproxy_config }} backup=yes
+  notify: restart haproxy

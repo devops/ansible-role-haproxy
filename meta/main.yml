@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: z
+  description: Installs and configure haproxy
+  company:
+  license: license (BSD, MIT)
+  min_ansible_version: 1.8
+  platforms:
+  - name: EL
+    versions:
+    - 6
+    - 7
+  categories:
+  - networking
+  - system
+  - web
+dependencies: []

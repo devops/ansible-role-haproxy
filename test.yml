@@ -1,0 +1,29 @@
+---
+# test file
+
+- hosts: servers
+  roles:
+     - role: ansible-role-haproxy
+       haproxy_stats:
+         name: 'global_monitor'
+         ip: "{{ ansible_default_ipv4.address }}"
+         port: '38888'
+         stats:
+           enabled: True
+           hide_version: true
+           uri: /slb_stats_url
+           realm: Welcome\ to\ slb\ monitor
+           auth: admin:admin
+           refresh: 2s
+       haproxy_frontends:
+       - name: 'fe-testsite'
+         ip: '{{ ansible_default_ipv4.address }}'
+         port: '80'
+         maxconn: '1000'
+         default_backend: 'be-testsite'
+       haproxy_backends:
+       - name: 'be-testsite'
+         description: 'testsite'
+         servers:
+           - name: 'be-testsite-01'
+             ip: '192.168.1.100'
