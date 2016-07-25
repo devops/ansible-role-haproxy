@@ -8,6 +8,14 @@
     - socat
   ignore_errors: true
 
+- name: Make haproxy bindable on non local addresses
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: 1
+    sysctl_set: yes
+    state: present
+  when: haproxy_bind_on_non_local | bool
+
 - name: Ensure HAProxy is started and enabled on boot.
   service: name=haproxy enabled=yes
 

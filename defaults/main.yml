@@ -3,6 +3,7 @@
 
 haproxy_manage_config: true
 haproxy_etc_prefix: /etc
+haproxy_bind_on_non_local: True
 
 haproxy_global:
   log:
