@@ -2,7 +2,7 @@
 # tasks file for RedHat
 
 - name: Installs haproxy as well as socat for socket api.
-  yum: name={{ item }} state=installed
+  yum: name="{{ item }}" state=installed
   with_items:
     - haproxy
     - socat
