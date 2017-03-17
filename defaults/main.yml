@@ -62,3 +62,4 @@ haproxy_stats:
     realm: Welcome\ to\ haproxy\ monitor
     auth: admin:admin
     refresh: 2s
+  mode: http
