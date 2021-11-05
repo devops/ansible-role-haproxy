@@ -1,5 +1,7 @@
 # Ansible Role: haproxy
 
+# Just for trying, I'm wring these sentence. Thanks a lot, for giving me this chance...
+
 Installs HAProxy on RedHat/CentOS servers.
 
 ## Requirements
